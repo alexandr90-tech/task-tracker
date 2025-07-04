@@ -12,7 +12,7 @@ import (
 
 func main() {
 
-	store := task.NewStore()
+	store := task.NewStore("tasks.json")
 
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Server is alive")
