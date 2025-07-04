@@ -59,14 +59,33 @@ func main() {
 				return
 			}
 
-			task, ok := store.UpdateTaskDone(id, input.Done)
-			if !ok {
+			task, err := store.UpdateTaskDone(id, input.Done)
+			if err != nil {
 				http.Error(w, "Task not found", http.StatusNotFound)
 				return
 			}
 
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(task)
+		case "DELETE":
+			idStr := r.URL.Query().Get("id")
+			if idStr == "" {
+				http.Error(w, "Missing id parameter", http.StatusBadRequest)
+				return
+			}
+			id, err := strconv.Atoi(idStr)
+			if err != nil {
+				http.Error(w, "Invalid id parameter", http.StatusBadRequest)
+				return
+			}
+
+			ok := store.DeleteTask(id)
+			if !ok {
+				http.Error(w, "Task not found", http.StatusNotFound)
+				return
+			}
+
+			w.WriteHeader(http.StatusNoContent) // 204 No Content, успешное удаление без тела
 
 		default:
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
